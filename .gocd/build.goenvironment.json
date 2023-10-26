@@ -1,0 +1,6 @@
+{
+  "name": "Build",
+  "pipelines": [
+    "build-manager-restaurant-rs"
+  ]
+}

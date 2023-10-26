@@ -1,0 +1,153 @@
+<project xmlns="http://maven.apache.org/POM/4.0.0"
+  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+  <parent>
+    <groupId>br.com.food.service</groupId>
+    <artifactId>food-manager-restaurant-parent</artifactId>
+    <version>1.0.0-SNAPSHOT</version>
+  </parent>
+  <modelVersion>4.0.0</modelVersion>
+  <artifactId>food-manager-restaurant-runner</artifactId>
+  <name>ManagerRestaurant Runner</name>
+  <version>1.0.0-SNAPSHOT</version>
+  <packaging>jar</packaging>
+
+  <properties>
+    <docker.register>docker.food.com.br</docker.register>
+    <docker.alias>food/manager-restaurant</docker.alias>
+    <docker.image.name>${docker.alias}</docker.image.name>
+    <docker.image.tag>${project.version}</docker.image.tag>
+    <docker.log.volume>/mnt/log/${docker.alias}</docker.log.volume>
+    <docker.tag.lastest>${project.version}</docker.tag.lastest>
+    <docker.http.port>9090</docker.http.port>
+    <docker.hostname>manager-restaurant-serv</docker.hostname>
+    <maven.deploy.skip>true</maven.deploy.skip>
+  </properties>
+
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-tomcat</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter</artifactId>
+      <exclusions>
+        <exclusion>
+          <groupId>org.springframework.boot</groupId>
+          <artifactId>spring-boot-starter-logging</artifactId>
+        </exclusion>
+      </exclusions>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-log4j2</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-jetty</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-test</artifactId>
+      <scope>test</scope>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger2</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>io.springfox</groupId>
+      <artifactId>springfox-swagger-ui</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-context-support</artifactId>
+    </dependency>
+
+    <dependency>
+      <groupId>org.springframework</groupId>
+      <artifactId>spring-web</artifactId>
+    </dependency>
+
+  </dependencies>
+
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+        <executions>
+          <execution>
+            <goals>
+              <goal>repackage</goal>
+            </goals>
+          </execution>
+        </executions>        
+      </plugin>
+
+      <!-- Plugin para geracao de Docker -->
+      <plugin>
+        <groupId>io.fabric8</groupId>
+        <artifactId>docker-maven-plugin</artifactId>
+        <configuration>
+          <images>
+            <image>
+              <name>${docker.image.name}</name>
+              <alias>${docker.alias}</alias>
+              <registry>${docker.register}</registry>
+              <build>
+                <cleanup>true</cleanup>
+                <tags>
+                  <tag>${docker.image.tag}</tag>
+                  <tag>${docker.tag.lastest}</tag>
+                </tags>
+                <dockerFileDir>.</dockerFileDir>
+                <assembly>
+                  <mode>dir</mode>
+                  <exportBasedir>true</exportBasedir>
+                  <descriptor>assembly.xml</descriptor>
+                </assembly>
+              </build>
+              <run>
+                <hostname>${docker.hostname}</hostname>
+                <namingStrategy>alias</namingStrategy>
+                <ports>
+                  <port>${docker.http.port}</port>
+                </ports>
+                <env>
+                  <!-- as variaveis aqui nao serao incluidas no script de start <EXTRA_JAVA_OPTS></EXTRA_JAVA_OPTS> -->
+                  <CONSUL_URI>${consul.uri}</CONSUL_URI>
+                </env>
+                <volumes>
+                  <bind>
+                    <volume>${docker.log.volume}:/opt/app/logs</volume>
+                  </bind>
+                </volumes>
+                <restartPolicy>
+                  <name>always</name>
+                </restartPolicy>
+              </run>
+            </image>
+          </images>
+        </configuration>
+      </plugin>
+    </plugins>
+  </build>
+
+</project>

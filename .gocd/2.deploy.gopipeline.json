@@ -1,0 +1,28 @@
+{
+  "format_version" : 1,
+  "group": "ManagerRestaurant",
+  "name": "deploy-manager-restaurant-rs",
+  "label_template": "${pipe}",
+  "enable_pipeline_locking" : false,
+  "template": "deploy-artifact",
+  "environment_variables": [
+    {
+      "name": "PRODUCTION_SET_VARS",
+      "value": "--set deployment.resourceLimits.type=high"
+    }
+  ],
+  "parameters": [
+    {
+      "name": "SERVICE",
+      "value": "manager-restaurant"
+    }
+  ],
+  "materials": [
+      {
+        "pipeline": "build-manager-restaurant-rs",
+        "stage": "HelmPush",
+        "name": "pipe",
+        "type": "dependency"
+      }
+  ]
+}

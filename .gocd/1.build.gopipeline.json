@@ -1,0 +1,21 @@
+{
+  "format_version" : 1,
+  "group": "ManagerRestaurant",
+  "name": "build-manager-restaurant-rs",
+  "label_template": "${repo.git[:8]}-${COUNT}",
+  "enable_pipeline_locking" : false,
+  "template": "build-maven-artifact",
+  "parameters": [
+    {
+      "name": "SERVICE",
+      "value": "manager-restaurant"
+    }
+  ],
+  "materials": [
+      {
+        "name": "repo.git",
+        "url": "git@github.com:fabiobatista32/manager-restaurant-rs.git",
+        "type": "git"
+      }
+  ]
+}

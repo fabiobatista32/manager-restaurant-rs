@@ -1,0 +1,56 @@
+deployment:
+  replicaCount: 1
+  strategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxSurge: 2
+      maxUnavailable: 0
+  dependsOnServices: 
+    - consul-svc:88
+  image:
+    repository: docker.food.com.br/food/manager-restaurant
+    tag: 1.0.0-SNAPSHOT
+    pullPolicy: Always
+  containerPort: 9090
+  metricsPort: 1111
+  resourceLimits:
+    type: low
+    low:
+      memory: 128Mi
+      mincpu: 0.1
+      maxcpu: 0.2
+    high:
+      memory: 256Mi
+      mincpu: 0.2
+      maxcpu: 0.3
+  livenessProbe: 
+    enabled: true
+    tcpSocket:
+      port: containerPort
+    initialDelaySeconds: 30
+    periodSeconds: 10
+    timeoutSeconds: 20
+  readinessProbe: 
+    enabled: true
+    httpGet:
+      path: /manager-restaurant/actuator/health
+    initialDelaySeconds: 60
+    periodSeconds: 30
+    timeoutSeconds: 20
+service:
+  type: ClusterIP
+ingress:
+  enabled: true
+  hosts:
+    - '*.food.com.br'
+    - '*.food'
+    - '*.internal.food'
+  path: /manager-restaurant
+  annotations:
+      kubernetes.io/ingress.class: internal
+      nginx.ingress.kubernetes.io/proxy-body-size: "5G"
+      nginx.ingress.kubernetes.io/proxy-send-timeout: 3600
+      nginx.ingress.kubernetes.io/proxy-read-timeout: 3600
+      nginx.ingress.kubernetes.io/proxy-connect-timeout: 90
+      nginx.ingress.kubernetes.io/send-timeout: 3600      
+
